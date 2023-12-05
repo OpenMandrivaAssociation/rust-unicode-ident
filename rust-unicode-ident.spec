@@ -1,3 +1,6 @@
+# Rust packages always list license files and docs
+# inside the crate as well as the containing directory
+%undefine _duplicate_files_terminate_build
 %bcond_with check
 %global debug_package %{nil}
 
@@ -5,8 +8,9 @@
 
 Name:           rust-unicode-ident
 Version:        1.0.12
-Release:        1
+Release:        2
 Summary:        Determine whether characters have the XID_Start or XID_Continue properties according to Unicode Standard Annex #31
+Group:          Development/Rust
 
 License:        (MIT OR Apache-2.0) AND Unicode-DFS-2016
 URL:            https://crates.io/crates/unicode-ident
@@ -14,7 +18,8 @@ Source:         %{crates_source}
 
 ExclusiveArch:  %{rust_arches}
 
-BuildRequires:  rust-packaging >= 21
+BuildRequires:  cargo-rpm-macros >= 24
+BuildRequires:  rust >= 1.31
 %if %{with check}
 BuildRequires:  (crate(criterion) >= 0.5.0 with crate(criterion) < 0.6.0~)
 BuildRequires:  (crate(fst/default) >= 0.4.0 with crate(fst/default) < 0.5.0~)
@@ -33,9 +38,11 @@ properties according to Unicode Standard Annex #31.}
 
 %package        devel
 Summary:        %{summary}
+Group:          Development/Rust
 BuildArch:      noarch
 Provides:       crate(unicode-ident) = 1.0.12
 Requires:       cargo
+Requires:       rust >= 1.31
 
 %description    devel %{_description}
 
@@ -47,14 +54,11 @@ use the "%{crate}" crate.
 %license %{crate_instdir}/LICENSE-MIT
 %license %{crate_instdir}/LICENSE-UNICODE
 %doc %{crate_instdir}/README.md
-%dir %{crate_instdir}
-%{crate_instdir}/.cargo-checksum.json
-%{crate_instdir}/benches
-%{crate_instdir}/src
-%{crate_instdir}/tests
+%{crate_instdir}/
 
 %package     -n %{name}+default-devel
 Summary:        %{summary}
+Group:          Development/Rust
 BuildArch:      noarch
 Provides:       crate(unicode-ident/default) = 1.0.12
 Requires:       cargo
@@ -69,7 +73,7 @@ use the "default" feature of the "%{crate}" crate.
 %ghost %{crate_instdir}/Cargo.toml
 
 %prep
-%autosetup -n %{crate}-%{version_no_tilde} -p1
+%autosetup -n %{crate}-%{version} -p1
 %cargo_prep
 
 %build
@@ -82,7 +86,3 @@ use the "default" feature of the "%{crate}" crate.
 %check
 %cargo_test
 %endif
-
-%changelog
-* Tue Dec 05 2023 Bernhard Rosenkränzer <bero@lindev.ch> - 1.0.12-1
-- Initial package
